@@ -28,6 +28,9 @@ namespace SandBox
             Console.WriteLine(it.data);
 
             list.Display();
+
+            foreach (var i in list)
+                Console.WriteLine(i);
         }
     }
 
@@ -191,34 +194,45 @@ namespace SandBox
         // ================================================
         // ------------------- 열거자 ------------------- 
         // ================================================
-        private int pos = -1;
+        private DCLNode<T> current = null;
         public IEnumerator<T> GetEnumerator()
         {
-            for (int i = 0; i < Length; ++i) yield return this[pos];
+            if (current == null)
+                current = front;
+            do
+            {
+                yield return current.data;
+                current = current.next;
+            } while (current != front);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            for (int i = 0; i < Length; ++i) yield return this[pos];
+            if (current == null)
+                current = front;
+            do
+            {
+                yield return current.data;
+                current = current.next;
+            } while (current != front);
         }
 
-        public T Current { get { return this[pos]; } }
-        object IEnumerator.Current { get { return this[pos]; } }
+        public T Current { get { return current.data; } }
+        object IEnumerator.Current { get { return current.data; } }
 
         public bool MoveNext()
         {
-            if (pos == Length - 1)
+            if (current == tail)
             {
                 Reset();
                 return false;
             }
-            ++pos;
-            return (pos < Length);
+            return true;
         }
 
         public void Reset()
         {
-            pos = -1;
+            current = tail;
         }
 
         public void Dispose()
